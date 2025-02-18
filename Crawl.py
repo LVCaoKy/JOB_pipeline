@@ -15,6 +15,7 @@ from selenium.webdriver.common.by import By
 import pandas as pd
 from selenium.webdriver.chrome.options import Options
 from sqlalchemy import create_engine
+import psycopg2
                                                 ##CONFIGURE
 
 nameCol_Maximum = ['Link','Diện tích', 'Mức giá','Hướng nhà','Hướng ban công', 'Số tầng', 'Số phòng ngủ', 'Số toilet', 'Pháp lý',
@@ -112,23 +113,18 @@ def RUN(X):
     X.Crawl()
 def store_data():
     data = X.result
-    # Thông tin kết nối PostgreSQL
     db_user = "postgres"
     db_password = "postgres"
     db_host = "127.0.0.1"
     db_port = "5432"
     db_name = "my_db"
-
-    # Tạo kết nối với PostgreSQL
-    engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}")
-
-    # Lưu DataFrame vào PostgreSQL (chọn tên bảng phù hợp)
+    engine = create_engine(f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}")
     data.to_sql('HOUSE', engine, if_exists='replace', index=False)
 X = batdongsan(link=link_web,name=nameCol)
 if __name__ == "__main__":
     atexit.register(store_data)
     process = Process(target=RUN(X))
     process.start()
-    time.sleep(60)
+    time.sleep(10)
     process.terminate()
     process.join()
