@@ -17,7 +17,6 @@ from selenium.webdriver.chrome.options import Options
 from sqlalchemy import create_engine
 import psycopg2
                                                 ##CONFIGURE
-
 nameCol_Maximum = ['Link','Diện tích', 'Mức giá','Hướng nhà','Hướng ban công', 'Số tầng', 'Số phòng ngủ', 'Số toilet', 'Pháp lý',
  'Nội thất','Title','Address','Ngày đăng','Ngày hết hạn','Loại tin','Mã tin','Check','Đường vào','Mặt tiền']
 nameCol = ['Loại tin','Mã tin','Link','Diện tích', 'Mức giá','Hướng nhà', 'Số tầng', 'Số phòng ngủ', 'Số toilet', 'Pháp lý',
@@ -28,7 +27,10 @@ nameCol = ['Loại tin','Mã tin','Link','Diện tích', 'Mức giá','Hướng 
 # link_web = 'https://batdongsan.com.vn/ban-dat-tp-hcm'
 link_web = 'https://batdongsan.com.vn/ban-nha-mat-pho-tp-hcm'
 # link_web = 'https://batdongsan.com.vn/ban-nha-biet-thu-lien-ke-tp-hcm'
-
+def clean_link(link):
+    if link is None or (isinstance(link, float) and np.isnan(link)) or link == "":
+        return ""
+    return link
 # Class Crawl
 class batdongsan():
     def __init__(self,link,name=[]):
@@ -72,11 +74,12 @@ class batdongsan():
         return links  ,next_page
     def getData(self,link):
         driver = self.driver
-        test = pd.Series(index=self.name)
+        test = pd.Series("",index=self.name,dtype="object")
         driver.get(link)
 
 
         # Các nội dung tổng quan về mẫu
+        link = clean_link(link)
         test['Link'] = link
         test['Title'] = driver.find_element(By.CSS_SELECTOR,'h1.re__pr-title').text
         test['Address'] = driver.find_element(By.CSS_SELECTOR,'.js__pr-address').text
@@ -125,6 +128,6 @@ if __name__ == "__main__":
     atexit.register(store_data)
     process = Process(target=RUN(X))
     process.start()
-    time.sleep(10)
+    time.sleep(3600)
     process.terminate()
     process.join()
