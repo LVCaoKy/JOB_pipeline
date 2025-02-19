@@ -1,0 +1,1 @@
+RUN DBT : dbt run --profiles-dir . --select <module_name>

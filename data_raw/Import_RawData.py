@@ -7,10 +7,10 @@ DB_PASSWORD = "postgres"
 DB_HOST = "127.0.0.1"  # Hoặc địa chỉ server PostgreSQL
 DB_PORT = "5432"  # Cổng mặc định của PostgreSQL
 DB_NAME = "my_db"
-TABLE_NAME = "HOUSE"
+TABLE_NAME = "HOUSE_HCM"
 
 # Đường dẫn file CSV
-CSV_FILE = "batdongsan.csv"
+CSV_FILE = "batdongsan_merged.csv"
 
 # Kết nối PostgreSQL
 engine = create_engine(f"postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")

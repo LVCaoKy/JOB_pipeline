@@ -19,7 +19,7 @@ import psycopg2
                                                 ##CONFIGURE
 nameCol_Maximum = ['Link','Diện tích', 'Mức giá','Hướng nhà','Hướng ban công', 'Số tầng', 'Số phòng ngủ', 'Số toilet', 'Pháp lý',
  'Nội thất','Title','Address','Ngày đăng','Ngày hết hạn','Loại tin','Mã tin','Check','Đường vào','Mặt tiền']
-nameCol = ['Loại tin','Mã tin','Link','Diện tích', 'Mức giá','Hướng nhà', 'Số tầng', 'Số phòng ngủ', 'Số toilet', 'Pháp lý',
+nameCol = ['Loại tin','Mã tin','Link','Diện tích', 'Mức giá','Hướng nhà', 'Số tầng', 'Số phòng ngủ', 'Số phòng tắm, vệ sinh', 'Pháp lý',
  'Nội thất','Title','Address','Đường vào','Mặt tiền']
 # link_web = 'https://batdongsan.com.vn/ban-nha-dat-tp-hcm'
 # link_web = 'https://batdongsan.com.vn/ban-can-ho-chung-cu-tp-hcm'
@@ -27,6 +27,26 @@ nameCol = ['Loại tin','Mã tin','Link','Diện tích', 'Mức giá','Hướng 
 # link_web = 'https://batdongsan.com.vn/ban-dat-tp-hcm'
 link_web = 'https://batdongsan.com.vn/ban-nha-mat-pho-tp-hcm'
 # link_web = 'https://batdongsan.com.vn/ban-nha-biet-thu-lien-ke-tp-hcm'
+column_mapping = {
+    "Loại tin": "loai_tin",
+    "Mã tin": "ma_tin",
+    "Link": "link",
+    "Diện tích": "dien_tich",
+    "Mức giá": "muc_gia",
+    "Hướng nhà": "huong_nha",
+    "Số tầng": "so_tang",
+    "Số phòng ngủ": "so_phong_ngu",
+    "Pháp lý": "phap_ly",
+    "Nội thất": "noi_that",
+    "Title": "title",
+    "Address": "address",
+    "Đường vào": "duong_vao",
+    "Mặt tiền": "mat_tien",
+    "Hướng ban công" : "huong_ban_cong",
+    "Ngày đăng" : "ngay_dang",
+    "Ngày hết hạn" : "ngay_het_han",
+    "Số phòng tắm, vệ sinh" : "so_toilet"
+}
 def clean_link(link):
     if link is None or (isinstance(link, float) and np.isnan(link)) or link == "":
         return ""
@@ -85,11 +105,11 @@ class batdongsan():
         test['Address'] = driver.find_element(By.CSS_SELECTOR,'.js__pr-address').text
 
         # Thử lấy dữ liệu xác thực và số zalo liên hệ
-        try:
-            test['Check'] = driver.find_element(By.CSS_SELECTOR,
-            '.js__product-detail-web .re__pr-stick-listing-verified .re__text').text
-        except NoSuchElementException :
-            test['Check']='Chưa Xác Thực'
+        # try:
+        #     test['Check'] = driver.find_element(By.CSS_SELECTOR,
+        #     '.js__product-detail-web .re__pr-stick-listing-verified .re__text').text
+        # except NoSuchElementException :
+        #     test['Check']='Chưa Xác Thực'
         # Thử lấy dữ liệu chi tiêt về mẫu
         name_data = driver.find_elements(By.CSS_SELECTOR,
 
@@ -115,6 +135,7 @@ class batdongsan():
 def RUN(X):
     X.Crawl()
 def store_data():
+    X.result.columns = X.result.columns.to_series().replace(column_mapping, regex=True)
     data = X.result
     db_user = "postgres"
     db_password = "postgres"
@@ -122,7 +143,7 @@ def store_data():
     db_port = "5432"
     db_name = "my_db"
     engine = create_engine(f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}")
-    data.to_sql('HOUSE', engine, if_exists='replace', index=False)
+    data.to_sql('HOUSE_HCM', engine, index=False, if_exists='append')
 X = batdongsan(link=link_web,name=nameCol)
 if __name__ == "__main__":
     atexit.register(store_data)
