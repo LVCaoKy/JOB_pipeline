@@ -1,0 +1,12 @@
+ETL:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: 127.0.0.1
+      user: postgres
+      password: postgres
+      port: 5432
+      dbname: my_db
+      schema : public
+      threads: 10
