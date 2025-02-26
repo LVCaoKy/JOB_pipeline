@@ -1,8 +1,8 @@
-SELECT
-    ROW_NUMBER() OVER () AS Add_id,
+{{ config(order_by='City', engine='MergeTree()') }}
+SELECT DISTINCT ON (City,District,Ward,Street)
+    generateUUIDv4() AS Add_id,
     City,
     District,
     Street,
-    Ward,
-    More
-FROM {{ref("House_Address")}}
+    Ward
+FROM {{ ref("Processed_Data") }}

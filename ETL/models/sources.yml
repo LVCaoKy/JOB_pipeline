@@ -1,7 +1,7 @@
 version: 2
 sources:
-  - name: RAW
-    database: my_db
-    schema: public
+  - name: clickhouse
+    database: default
+    schema: default
     tables: 
-    - name: HOUSE_HCM
+    - name: batdongsan_merged

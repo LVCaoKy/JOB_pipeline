@@ -1,12 +1,10 @@
 ETL:
-  target: dev
+  target: clickhouse
   outputs:
-    dev:
-      type: postgres
-      host: 127.0.0.1
-      user: postgres
-      password: postgres
-      port: 5432
-      dbname: my_db
-      schema : public
-      threads: 10
+    clickhouse:
+      type: clickhouse
+      host: lbanrxx268.ap-southeast-1.aws.clickhouse.cloud
+      user: default
+      password: ~WfW3boz~nJtl
+      port: 8443
+      secure: True

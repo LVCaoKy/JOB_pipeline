@@ -1,25 +1,16 @@
 import pandas as pd
-from sqlalchemy import create_engine
-
-# Cấu hình kết nối PostgreSQL
-DB_USERNAME = "postgres"
-DB_PASSWORD = "postgres"
-DB_HOST = "127.0.0.1"  # Hoặc địa chỉ server PostgreSQL
-DB_PORT = "5432"  # Cổng mặc định của PostgreSQL
-DB_NAME = "my_db"
-TABLE_NAME = "HOUSE_HCM"
-
-# Đường dẫn file CSV
-CSV_FILE = "batdongsan_merged.csv"
-
-# Kết nối PostgreSQL
-engine = create_engine(f"postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
-
-# Đọc dữ liệu từ CSV
-print("Đang đọc dữ liệu từ CSV...")
-df = pd.read_csv(CSV_FILE, encoding="utf-8")
-
-# Đưa dữ liệu vào PostgreSQL
-df.to_sql(TABLE_NAME, engine, if_exists="append", index=False)
-
-print("Nhập dữ liệu thành công vào bảng HOUSE!")
+import clickhouse_connect
+data = pd.read_csv('batdongsan_merged.csv')
+client = clickhouse_connect.get_client(
+    host="lbanrxx268.ap-southeast-1.aws.clickhouse.cloud",
+    port=8443,
+    username="default",
+    password="~WfW3boz~nJtl",
+    secure=True
+)
+data['ngay_dang'] = pd.to_datetime(data['ngay_dang'], dayfirst=True)
+data['ma_tin'] = data['ma_tin'].astype(int)
+data = data.where(pd.notna(data), None)
+# Insert dữ liệu vào ClickHouse
+records = [tuple(str(row) if isinstance(row, float) else row for row in r) for r in data.itertuples(index=False, name=None)]
+client.insert("batdongsan", records, column_names=list(data.columns))
