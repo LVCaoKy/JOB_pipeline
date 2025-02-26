@@ -16,6 +16,8 @@ import pandas as pd
 from selenium.webdriver.chrome.options import Options
 import clickhouse_connect
 from decimal import Decimal
+import os
+import signal
                                                 ##CONFIGURE
 nameCol_Maximum = ['Link','Diện tích', 'Mức giá','Hướng nhà','Hướng ban công', 'Số tầng', 'Số phòng ngủ', 'Số toilet', 'Pháp lý',
  'Nội thất','Title','Address','Ngày đăng','Loại tin','Mã tin','Check','Đường vào','Mặt tiền']
@@ -72,6 +74,8 @@ class batdongsan():
                 # if List_link[i] in link_have :
                 #     continue
                 self.getData(List_link[i])
+                if len(self.result) >= 1:
+                    return
             web_page = next_page
             if web_page == None:
                 break
@@ -144,7 +148,7 @@ def store_data():
         secure=True
     )
     data['ngay_dang'] = pd.to_datetime(data['ngay_dang'], dayfirst=True)
-    data['ngay_het_han'] = pd.to_datetime(data['ngay_het_han'], dayfirst=True)
+    data = data.drop(columns=["Ngày hết hạn"], errors="ignore")
     data['ma_tin'] = data['ma_tin'].astype(int)
     data = data.where(pd.notna(data), None)
     # Insert dữ liệu vào ClickHouse
@@ -155,6 +159,7 @@ if __name__ == "__main__":
     atexit.register(store_data)
     process = Process(target=RUN(X))
     process.start()
-    time.sleep(3600)
+    time.sleep(10)
+    if process.is_alive():  # Kiểm tra nếu process vẫn chạy
+        os.kill(process.pid, signal.SIGKILL)  # Ép buộc dừng (SIGKILL)
     process.terminate()
-    process.join()
