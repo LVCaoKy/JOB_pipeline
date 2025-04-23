@@ -1,4 +1,5 @@
-#Configure and library
+                                                ##Note
+#This code is right if you use chrome and have chrome's driver , if you want to crawl another web , U can use my this code but fix tag name or linh suit for web U want
                                                 ##LIBRARY
 import atexit
 from multiprocessing import Process
@@ -52,7 +53,9 @@ def clean_link(link):
     if link is None or (isinstance(link, float) and np.isnan(link)) or link == "":
         return ""
     return link
-# Class Crawl
+
+
+# Class Crawl Data
 class batdongsan():
     def __init__(self,link,name=[]):
         self.link = link
@@ -135,8 +138,12 @@ class batdongsan():
             test[name_data_2[i].text] = value_data_2[i].text
 
         self.result = pd.concat([self.result, test.to_frame().T], ignore_index=True)
+
+# function to run class Crawl
 def RUN(X):
     X.Crawl()
+
+# Store data crawled when this file was stop
 def store_data():
     X.result.columns = X.result.columns.to_series().replace(column_mapping, regex=True)
     data = X.result
@@ -155,6 +162,8 @@ def store_data():
     records = [tuple(str(row) if isinstance(row, Decimal) else row for row in r) for r in data.itertuples(index=False, name=None)]
     client.insert("batdongsan_merged", records, column_names=list(data.columns))
 X = batdongsan(link=link_web,name=nameCol)
+
+# THIS IS MAIN IN FILE
 if __name__ == "__main__":
     atexit.register(store_data)
     process = Process(target=RUN(X))
