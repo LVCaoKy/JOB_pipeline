@@ -1,3 +1,4 @@
+Token: "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"
 agate==1.9.1
 aiohappyeyeballs==2.4.6
 aiohttp==3.11.12
